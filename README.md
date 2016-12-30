@@ -124,6 +124,16 @@ Hãy làm cho nó đơn giản: một mô-đun chỉ nên làm một việc và 
 
 Hãy chọn [async](https://github.com/caolan/async).
 
+Trong năm 2016, chắc chắn bạn đã nghe rất nhiều một loạt các khái niệm mới như: `Promise`, `Async`, `Await`, `Generator` trong **ES2016**. Ý tưởng chính đằng sau tất cả những kỹ thuật này là cho phép bạn nâng cao khả năng viết mã không đồng bộ *async*.
+
+Vấn đề ở đây là các hàm đồng bộ trong `JavaScript` sẽ block toàn bộ các đoạn mã khác cho đến khi nó thực thi xong. Tuy nhiên, rõ ràng, cách viết mã đồng bộ sẽ giúp bạn dễ đọc code và hiểu luồng nghiệp vụ hơn. Và như thế, các cấu trúc lập trình không đồng bộ như `Promise` giúp bạn có một phong cách viết mã mới tiện hơn mà không làm tắc nghẽn quá trình thực thi javascript.
+
+Có rất nhiều hướng dẫn tuyệt vời ở đây mà bạn có thể tham khảo và bắt đầu chuyển đổi các đoạn mã của mình:
+
+* Promise: [http://www.html5rocks.com/en/tutorials/es6/promises/](http://www.html5rocks.com/en/tutorials/es6/promises/)
+* Async / Await: [https://www.twilio.com/blog/2015/10/asyncawait-the-hero-javascript-deserved.html](https://www.twilio.com/blog/2015/10/asyncawait-the-hero-javascript-deserved.html)
+* Generators  [https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Iterators_and_Generators](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Iterators_and_Generators)
+
 # Xử lý lỗi
 
 Các lỗi xảy ra có thể được chia thành 2 loại chính: Lỗi hệ thống và lỗi lập trình
@@ -158,6 +168,19 @@ Rõ ràng lỗi lập trình là `bug`. Đây là điều mà bạn cần tránh
 
 Với các `bug` lỗi lập trình, bạn sẽ không biết được trạng thái ứng dụng của bạn là như thế nào, và nó có thể tự thoát `crash` ngay lập tức khi xảy ra. Và bạn cần có một chương trình giám sát và tự khởi động lại, như: [pm2](http://pm2.keymetrics.io/), [forever](https://github.com/foreverjs/forever), [supervisord](http://supervisord.org/) hoặc [monit](http://mmonit.com/monit/).
 
+Rõ ràng khi hệ thống gặp lỗi như vậy, khách hàng của bạn sẽ không có được trải nghiệm tốt nhất. Thiết kế và quản lý tốt các ngoại lệ là rất quan trọng trong ứng dụng, và cách tốt nhất để đối phó với lỗi là sử dụng cấu trúc Async ở trên. Ví dụ, khi làm việc với Promise.
+
+Giả sử, bạn có một dãy các lời hứa promises, và bất kỳ một trong các lời hứa có thể ngẫu nhiên lỗi (thất hứa), bạn có thể dễ dàng xử lý lỗi đó trong hàm `.catch`
+
+```js
+createAHero()
+    .then(byASword)
+    .then(getAHorse)
+    .then(joinTheBattle)
+    .then(winAnAward)
+    .catch(errorHandler);
+```
+
 # Quy trình làm việc Workflow
 
 ## Khởi tạo một dự án mới với `npm init`
@@ -186,6 +209,22 @@ Chú ý: npm sẽ thiết lập biến `$PATH` để tìm chương trình thực
 
 ## Biến môi trường
 
+Quản lý cấu hình luôn là một chủ đề lớn trong mọi ngôn ngữ. Làm thế nào bạn có thể phân tách được các đoạn mã của bạn sử dụng CSDL, api services, ... trong các giai đoạn của quá trình phát triển. Tương ứng với giai đoạn phát triển, bàn giao kiểm thử, đảm bảo chất lượng, và triển khai thật ?
+
+Cách được khuyến nghị trong `Node.js` là sử dụng biến môi trường `process.env` trong code của bạn. Ví dụ, bạn có thể chắc chắn rằng ứng dụng đang chạy trên môi trường nào, bằng cách kiểm tra biến môi trường `NODE_ENV`;
+
+```js
+console.log("App is running in :"  + process.env.NODE_ENV);
+```
+
+Điều này đã trở thành một chuẩn được sử dụng trên hầu hết các nhà cung cấp dịch vụ `cloud-hosting`.
+
+Các tùy chọn khác, bạn có thể sử dụng 1 mô-đun để lấy và quản lý các cấu hình hợp lý như:
+
+* nconf: [https://github.com/indexzero/nconf](https://github.com/indexzero/nconf)
+* dotenv: [https://github.com/motdotla/dotenv](https://github.com/motdotla/dotenv)
+
+
 ## ĐỪNG CỐ PHÁT MINH LẠI CÁI BÁNH XE
 
 Luôn luôn tìm kiếm các giải pháp có sẵn trước. [NPM](https://npmjs.org) có rất rất nhiều packages được cung cấp miễn phí và bạn có thể dễ dàng tìm thấy nó.
@@ -194,7 +233,16 @@ Luôn luôn tìm kiếm các giải pháp có sẵn trước. [NPM](https://npmj
 
 Sẽ trở nên dễ dàng hơn để hiểu một hệ thống lớn, khi tất cả các đoạn mã được viết theo một phong cách nhất quán. Nó có thể bao gồm quy tắc thụt đầu dòng, quy ước đặt tên biến, cách làm tốt nhất, và nhiều quy định thống nhất khác nữa.
 
-Tham khảo một ví dụ thực tế của [RisingStack](http://risingstack.com/) [Node.js style guide](https://github.com/RisingStack/node-style-guide).
+Ngay bây giờ, bạn cũng không cần phải vắt óc để nghĩ ra các quy tắc cho riêng mình, đôi khi, việc lựa chọn một bộ hướng dẫn lập trình thực tế, đang được sử dụng và làm theo họ là cách làm tốt nhất. Đây là một vài mẫu guideline tốt mà bạn có thể tham khảo:
+
+* [RisingStack](http://risingstack.com/) [Node.js style guide](https://github.com/RisingStack/node-style-guide).
+* Airbnb - [https://github.com/airbnb/javascript](https://github.com/airbnb/javascript)
+* Google - [https://google.github.io/styleguide/javascriptguide.xml](https://google.github.io/styleguide/javascriptguide.xml)
+* jQuery - [https://contribute.jquery.org/style-guide/js/](https://contribute.jquery.org/style-guide/js/)
+* Standard JS - [http://standardjs.com/](http://standardjs.com/) 
+
+
+
 
 
 
